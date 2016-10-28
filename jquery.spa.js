@@ -14,7 +14,7 @@
         throw new Error('Invalid `pageSelector` option specified.');
       }
 
-      this.element.find(this.pageSelector).hide();
+      this.element.find(this.options.pageSelector).hide();
 
       this._activePage = null;
 
@@ -129,7 +129,10 @@
     },
 
     _defaultContentLoader: function(url) {
-      return $.get(url)
+      return $.get({
+        dataType: 'html',
+        url:      url
+      })
     }
   });
 })(jQuery);
