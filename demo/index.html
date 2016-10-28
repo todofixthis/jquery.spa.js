@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>spa Plugin Example</title>
+  </head>
+
+  <body>
+    <ul>
+      <li><a href="#static">Static content</a></li>
+      <li><a href="#remote">Remotely-loaded content</a></li>
+    </ul>
+
+    <div id="content-area">
+      <section id="static">
+        <p>Hello, world!</p>
+      </section>
+
+      <section id="remote" data-src="remote.html"></section>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script src="../jquery.spa.js"></script>
+    <script>
+      (function($) {
+        $(function() {
+          $('#content-area').spa();
+        });
+      })(jQuery);
+    </script>
+  </body>
+</html>
