@@ -36,7 +36,16 @@
     },
 
     reload: function() {
-      this.element.find(this.options.pageSelector).data('loaded', false);
+      // Purge remotely-loaded content.
+      this.element
+        .find(this.options.pageSelector)
+        .filter('[data-src]:data(loaded)')
+        .each(function() {
+          $(this)
+            .empty()
+            .data('loaded', false);
+        });
+
       if(this._activePage) {
         this._loadPage(this._activePage);
       }
