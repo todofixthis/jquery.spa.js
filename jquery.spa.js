@@ -123,12 +123,17 @@
         page = page.filter(':first');
       }
 
-      if(! page.data('loaded')) {
+      var widget    = this,
+          sequencer = $.Deferred();
+
+      if(page.data('loaded')) {
+        // Content already loaded.  Show the page.
+        sequencer.resolve();
+      } else {
         var url = page.data('src');
         if(url) {
           this.element.trigger('todofixthis.spa.pageContentStart', page, url);
 
-          var widget = this;
           this.options.contentLoader(url)
             .done(function(html) {
               page.html(html).data('loaded', true);
@@ -137,29 +142,9 @@
                 page
               );
 
-              // Hide the current page, if applicable.
-              if(widget._activePage) {
-                widget.element.trigger(
-                  'todofixthis.spa.pageHideStart',
-                  widget._activePage
-                );
-
-                widget._activePage.hide();
-
-                var previousPage = widget._activePage;
-                widget._activePage = null;
-
-                widget.element.trigger(
-                  'todofixthis.spa.pageHideFinish',
-                  previousPage
-                );
-              }
-
-              // Show the new page.
-              widget.element.trigger('todofixthis.spa.pageShowStart', page);
-              page.show();
-              widget._activePage = page;
-              widget.element.trigger('todofixthis.spa.pageShowFinish', page);
+              // If we have content to load, don't show the page until
+              //  the content is loaded.
+              sequencer.resolve();
             })
             .fail(function(jqXhr) {
               widget.element.trigger(
@@ -175,8 +160,40 @@
                 jqXhr
               );
             });
+        } else {
+          // Nothing to load (i.e., static content).  Show the page.
+          page.data('loaded', true);
+          sequencer.resolve();
         }
       }
+
+      // Wait until the content is ready before we try to switch the
+      //  active page.
+      sequencer.done(function() {
+        // Hide the current page, if applicable.
+        if(widget._activePage) {
+          widget.element.trigger(
+            'todofixthis.spa.pageHideStart',
+            widget._activePage
+          );
+
+          widget._activePage.hide();
+
+          var previousPage = widget._activePage;
+          widget._activePage = null;
+
+          widget.element.trigger(
+            'todofixthis.spa.pageHideFinish',
+            previousPage
+          );
+        }
+
+        // Show the new page.
+        widget.element.trigger('todofixthis.spa.pageShowStart', page);
+        page.show();
+        widget._activePage = page;
+        widget.element.trigger('todofixthis.spa.pageShowFinish', page);
+      });
     }
   });
 })(jQuery);
